@@ -20,7 +20,7 @@ const db = getDatabase(app);
 const positions = ["Buffer Trust Staff", "Trust Staff", "Senior Trust Staff", "Branch Supervisor", "Area Head"];
 const tenureBrackets = ["New Hire (<1y)", "Junior (1-3y)", "Senior (3-5y)", "Veteran (5y+)"];
 
-// Authentication Observer
+// Global Auth Observer
 onAuthStateChanged(auth, (user) => {
     if (user) {
         document.getElementById('login-screen').classList.add('hidden');
@@ -38,29 +38,28 @@ onAuthStateChanged(auth, (user) => {
     }
 });
 
-// Login Function
+// Login Handler - Attached to Window for HTML accessibility
 window.handleLogin = async () => {
     const email = document.getElementById('loginEmail').value;
     const pass = document.getElementById('loginPass').value;
     try { await signInWithEmailAndPassword(auth, email, pass); } 
-    catch (e) { alert(e.message); }
+    catch (e) { alert("Login Error: " + e.message); }
 };
 
 document.getElementById('logoutBtn').onclick = () => signOut(auth);
 
-// Online Users Tracker
 function initOnlineTracker() {
     onValue(ref(db, 'online_users'), (snap) => {
         const list = document.getElementById('online-list');
         list.innerHTML = '';
         const data = snap.val();
         if (data) Object.values(data).forEach(u => {
-            list.innerHTML += `<div class="online-user-item"><div class="status-dot"></div><span>${u.email.split('@')[0]}</span></div>`;
+            const name = u.email.split('@')[0];
+            list.innerHTML += `<div class="online-user-item"><div class="status-dot"></div><span>${name}</span></div>`;
         });
     });
 }
 
-// Directory Initialization
 function initDirectory() {
     onValue(ref(db, 'staff'), (snap) => {
         const list = [];
@@ -70,7 +69,6 @@ function initDirectory() {
     });
 }
 
-// Field Validation
 const fieldIds = ['branch', 'staffName', 'position', 'contact', 'dateHired', 'birthday', 'address'];
 const validateFields = () => {
     const allFilled = fieldIds.every(id => document.getElementById(id).value.trim() !== "");
@@ -78,7 +76,6 @@ const validateFields = () => {
 };
 fieldIds.forEach(id => document.getElementById(id).addEventListener('input', validateFields));
 
-// Save to Firebase
 document.getElementById('saveBtn').onclick = async () => {
     const obj = {};
     fieldIds.forEach(id => obj[id] = document.getElementById(id).value.trim());
@@ -88,11 +85,13 @@ document.getElementById('saveBtn').onclick = async () => {
 };
 
 function calculateAge(bday) {
+    if(!bday) return 0;
     const diff = Date.now() - new Date(bday).getTime();
     return Math.abs(new Date(diff).getUTCFullYear() - 1970);
 }
 
 function getTenureData(hired) {
+    if(!hired) return { str: "0y 0m", bracket: "New Hire (<1y)" };
     const d = new Date(hired);
     const now = new Date();
     let y = now.getFullYear() - d.getFullYear();
@@ -127,19 +126,17 @@ function renderUI(data) {
             <td>${s.contact}</td><td class="address-cell" title="${s.address}">${s.address}</td>
             <td>${s.dateHired}</td><td>${calculateAge(s.birthday)}</td>
             <td style="color:var(--accent-blue); font-weight:bold">${tenureInfo.str}</td>
-            <td><button class="del-btn" data-id="${s.id}">DEL</button></td>
+            <td><button style="color:var(--accent-red); background:none; font-size:10px" onclick="deleteRec('${s.id}')">REMOVE</button></td>
         `;
     });
-
-    document.querySelectorAll('.del-btn').forEach(btn => {
-        btn.onclick = () => {
-            if(confirm("Delete record?")) remove(ref(db, 'staff/' + btn.dataset.id));
-        };
-    });
-
     renderMatrix(branchMatrix, "branchPositionSummary", "Branch");
     renderMatrix(tenureMatrix, "tenurePositionSummary", "Tenure Bracket", tenureBrackets);
 }
+
+// Delete Handler - Attached to Window
+window.deleteRec = (id) => { 
+    if(confirm("Permanently delete this record?")) remove(ref(db, 'staff/' + id)); 
+};
 
 function renderMatrix(groupedData, elementId, firstColName, customKeys = null) {
     let html = `<table class="summary-table"><thead><tr><th>${firstColName}</th>`;
@@ -165,7 +162,7 @@ function renderMatrix(groupedData, elementId, firstColName, customKeys = null) {
 
     html += `<tr class="grand-total-row"><td>GRAND TOTAL</td>`;
     columnTotals.forEach(ct => html += `<td>${ct}</td>`);
-    html += `<td>${grandTotalCount}</td></tr>`;
+    html += `<td>${grandTotalCount}</td></tr></tbody></table>`;
 
-    document.getElementById(elementId).innerHTML = html + `</tbody></table>`;
+    document.getElementById(elementId).innerHTML = html;
 }

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Directory - Misamis Oriental 2</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="login-screen">
+    <div class="login-box">
+        <h2 style="color:var(--accent-blue)">System Access</h2>
+        <div class="input-field" style="margin-bottom:15px">
+            <label>Email</label>
+            <input type="email" id="loginEmail" placeholder="user@rafi.org.ph">
+        </div>
+        <div class="input-field" style="margin-bottom:20px">
+            <label>Password</label>
+            <input type="password" id="loginPass" placeholder="••••••••">
+        </div>
+        <button class="btn-add" id="loginBtn">Sign In</button>
+    </div>
+</div>
+
+<div id="sidebar" class="hidden">
+    <div class="sidebar-title">Online Staff</div>
+    <div id="online-list"></div>
+    <button class="btn-logout" id="logoutBtn">Logout</button>
+</div>
+
+<div id="main-content" class="hidden">
+    <div class="container">
+        <h2 style="margin-top:0; color:var(--accent-blue)">Staff Directory | MO2</h2>
+        
+        <div class="input-grid">
+            <div class="input-field"><label>Branch</label>
+                <select id="branch">
+                    <option value="">-- Select --</option>
+                    <option value="Balingasag">Balingasag</option>
+                    <option value="Balingoan">Balingoan</option>
+                    <option value="Camiguin">Camiguin</option>
+                    <option value="Claveria">Claveria</option>
+                    <option value="Gingoog">Gingoog</option>
+                    <option value="Salay">Salay</option>
+                </select>
+            </div>
+            <div class="input-field"><label>Staff Name</label><input type="text" id="staffName"></div>
+            <div class="input-field"><label>Position</label>
+                <select id="position">
+                    <option value="">-- Select --</option>
+                    <option value="Buffer Trust Staff">Buffer Trust Staff</option>
+                    <option value="Trust Staff">Trust Staff</option>
+                    <option value="Senior Trust Staff">Senior Trust Staff</option>
+                    <option value="Branch Supervisor">Branch Supervisor</option>
+                    <option value="Area Head">Area Head</option>
+                </select>
+            </div>
+            <div class="input-field"><label>Contact</label><input type="text" id="contact" maxlength="11"></div>
+            <div class="input-field"><label>Hired Date</label><input type="date" id="dateHired"></div>
+            <div class="input-field"><label>Birthday</label><input type="date" id="birthday"></div>
+            <div class="input-field"><label>Home Address</label><input type="text" id="address"></div>
+        </div>
+
+        <button id="saveBtn" class="btn-add" disabled>Add to Registry</button>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Branch</th><th>Name</th><th>Position</th><th>Contact</th><th>Address</th><th>Hired</th><th>Age</th><th>Tenure</th><th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="staffTableBody"></tbody>
+            </table>
+        </div>
+
+        <h3 class="summary-header">Branch & Manpower Matrix</h3>
+        <div id="branchPositionSummary"></div>
+
+        <h3 class="summary-header">Tenure & Position Matrix</h3>
+        <div id="tenurePositionSummary"></div>
+    </div>
+</div>
+
+<script type="module" src="script.js"></script>
+</body>
+</html>

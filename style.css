@@ -38,6 +38,7 @@ button { height: 40px; border-radius: 6px; font-weight: bold; cursor: pointer; b
 .btn-add:disabled { background: #cbd5e1; cursor: not-allowed; }
 .btn-logout { background: #334155; color: white; margin-top: auto; width: 100%; font-size: 0.7rem; }
 
+/* Filter Row Styles */
 .filter-row { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; margin-bottom: 15px; }
 .filter-input { background: #f8fafc; border: 1px solid var(--border-color); height: 35px; font-size: 0.85rem; }
 
@@ -48,8 +49,8 @@ td { padding: 10px; border-bottom: 1px solid #f1f5f9; }
 
 .address-cell { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #64748b; }
 
-.summary-table { width: 100%; text-align: center; border: 1px solid var(--border-color); margin: 10px 0 20px; border-collapse: collapse; }
-.summary-table th { text-align: center; background: #f8fafc; padding: 10px; border-bottom: 2px solid var(--border-color); color: #64748b; font-size: 0.7rem; }
-.summary-table td { padding: 10px; border-bottom: 1px solid #f1f5f9; }
+.summary-table { width: 100%; text-align: center; border: 1px solid var(--border-color); margin: 10px 0 20px; border-collapse: collapse; table-layout: fixed; }
+.summary-table th { text-align: center; background: #f8fafc; padding: 12px 5px; border-bottom: 2px solid var(--border-color); color: #64748b; font-size: 0.65rem; }
+.summary-table td { padding: 12px 5px; border-bottom: 1px solid #f1f5f9; word-wrap: break-word; }
 .summary-header { color: var(--accent-blue); margin-top: 25px; border-left: 4px solid var(--accent-blue); padding-left: 10px; font-size: 1.1rem; }
 .grand-total-row { background: #f0f9ff; font-weight: bold; color: var(--accent-blue); border-top: 2px solid var(--accent-blue); }

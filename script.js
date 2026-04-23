@@ -38,7 +38,7 @@ onAuthStateChanged(auth, (user) => {
     }
 });
 
-// Login Handler - Attached to Window for HTML accessibility
+// Login Handler - Attached to Window
 window.handleLogin = async () => {
     const email = document.getElementById('loginEmail').value;
     const pass = document.getElementById('loginPass').value;
@@ -133,14 +133,18 @@ function renderUI(data) {
     renderMatrix(tenureMatrix, "tenurePositionSummary", "Tenure Bracket", tenureBrackets);
 }
 
-// Delete Handler - Attached to Window
 window.deleteRec = (id) => { 
     if(confirm("Permanently delete this record?")) remove(ref(db, 'staff/' + id)); 
 };
 
 function renderMatrix(groupedData, elementId, firstColName, customKeys = null) {
-    let html = `<table class="summary-table"><thead><tr><th>${firstColName}</th>`;
+    let html = `<table class="summary-table">
+        <thead>
+            <tr>
+                <th style="text-align: left; padding-left: 10px;">${firstColName}</th>`;
+    
     positions.forEach(p => html += `<th>${p}</th>`);
+    
     html += `<th>TOTAL</th></tr></thead><tbody>`;
 
     const columnTotals = new Array(positions.length).fill(0);
@@ -149,20 +153,22 @@ function renderMatrix(groupedData, elementId, firstColName, customKeys = null) {
 
     keys.forEach(key => {
         let rowTot = 0;
-        html += `<tr><td>${key}</td>`;
+        html += `<tr><td style="text-align: left; padding-left: 10px;">${key}</td>`;
         positions.forEach((p, i) => {
             let val = (groupedData[key] && groupedData[key][p]) ? groupedData[key][p] : 0;
             rowTot += val;
             columnTotals[i] += val;
-            html += `<td>${val}</td>`;
+            // Hide 0 values by checking if val is 0
+            html += `<td>${val === 0 ? '' : val}</td>`;
         });
         grandTotalCount += rowTot;
-        html += `<td style="font-weight:bold; color:var(--accent-blue)">${rowTot}</td></tr>`;
+        html += `<td style="font-weight:bold; color:var(--accent-blue)">${rowTot === 0 ? '' : rowTot}</td></tr>`;
     });
 
-    html += `<tr class="grand-total-row"><td>GRAND TOTAL</td>`;
-    columnTotals.forEach(ct => html += `<td>${ct}</td>`);
-    html += `<td>${grandTotalCount}</td></tr></tbody></table>`;
+    html += `<tr class="grand-total-row">
+        <td style="text-align: left; padding-left: 10px;">GRAND TOTAL</td>`;
+    columnTotals.forEach(ct => html += `<td>${ct === 0 ? '' : ct}</td>`);
+    html += `<td>${grandTotalCount === 0 ? '' : grandTotalCount}</td></tr></tbody></table>`;
 
     document.getElementById(elementId).innerHTML = html;
 }

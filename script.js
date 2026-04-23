@@ -17,7 +17,8 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
 
-const positions = ["Buffer Trust Staff", "Trust Staff", "Senior Trust Staff", "Branch Supervisor", "Area Head"];
+// Added "Loan Processor" to the positions array
+const positions = ["Buffer Trust Staff", "Trust Staff", "Senior Trust Staff", "Loan Processor", "Branch Supervisor", "Area Head"];
 const tenureBrackets = ["New Hire (<1y)", "Junior (1-3y)", "Senior (3-5y)", "Veteran (5y+)"];
 
 let globalStaffData = [];
@@ -68,15 +69,12 @@ function initDirectory() {
             Object.keys(data).forEach(k => {
                 globalStaffData.push({ id: k, ...data[k] });
             });
-            // Reverse so that the latest entries are first
             globalStaffData.reverse();
         }
-        // Force the UI to update and apply existing filters
         applyFilters(); 
     });
 }
 
-// THE SEARCH & FILTER FUNCTION
 function applyFilters() {
     const search = document.getElementById('searchBox').value.toLowerCase();
     const branch = document.getElementById('filterBranch').value;
@@ -92,12 +90,10 @@ function applyFilters() {
     renderUI(filtered, globalStaffData);
 }
 
-// Link listeners to filter elements
 ['searchBox', 'filterBranch', 'filterPosition'].forEach(id => {
     document.getElementById(id).addEventListener('input', applyFilters);
 });
 
-// Input validation for adding new staff
 const fieldIds = ['branch', 'staffName', 'position', 'contact', 'dateHired', 'birthday', 'address'];
 const validateFields = () => {
     const allFilled = fieldIds.every(id => document.getElementById(id).value.trim() !== "");
@@ -141,7 +137,6 @@ function renderUI(displayData, totalData) {
     const tenureMatrix = {};
     tenureBrackets.forEach(b => tenureMatrix[b] = {});
 
-    // Always use ALL data for the top summaries
     totalData.forEach(s => {
         if(!branchMatrix[s.branch]) branchMatrix[s.branch] = {};
         branchMatrix[s.branch][s.position] = (branchMatrix[s.branch][s.position] || 0) + 1;
@@ -149,7 +144,6 @@ function renderUI(displayData, totalData) {
         tenureMatrix[tenureInfo.bracket][s.position] = (tenureMatrix[tenureInfo.bracket][s.position] || 0) + 1;
     });
 
-    // Use filtered data for the main table
     displayData.forEach(s => {
         const tenureInfo = getTenureData(s.dateHired);
         const row = tbody.insertRow();

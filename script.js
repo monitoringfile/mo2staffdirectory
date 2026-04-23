@@ -65,14 +65,18 @@ function initDirectory() {
         globalStaffData = [];
         const data = snap.val();
         if (data) {
-            Object.keys(data).forEach(k => globalStaffData.push({ id: k, ...data[k] }));
-            // Reverse so new entries appear first in the array
-            globalStaffData.reverse(); 
+            Object.keys(data).forEach(k => {
+                globalStaffData.push({ id: k, ...data[k] });
+            });
+            // Reverse so that the latest entries are first
+            globalStaffData.reverse();
         }
-        applyFilters();
+        // Force the UI to update and apply existing filters
+        applyFilters(); 
     });
 }
 
+// THE SEARCH & FILTER FUNCTION
 function applyFilters() {
     const search = document.getElementById('searchBox').value.toLowerCase();
     const branch = document.getElementById('filterBranch').value;
@@ -88,10 +92,12 @@ function applyFilters() {
     renderUI(filtered, globalStaffData);
 }
 
+// Link listeners to filter elements
 ['searchBox', 'filterBranch', 'filterPosition'].forEach(id => {
     document.getElementById(id).addEventListener('input', applyFilters);
 });
 
+// Input validation for adding new staff
 const fieldIds = ['branch', 'staffName', 'position', 'contact', 'dateHired', 'birthday', 'address'];
 const validateFields = () => {
     const allFilled = fieldIds.every(id => document.getElementById(id).value.trim() !== "");
@@ -135,6 +141,7 @@ function renderUI(displayData, totalData) {
     const tenureMatrix = {};
     tenureBrackets.forEach(b => tenureMatrix[b] = {});
 
+    // Always use ALL data for the top summaries
     totalData.forEach(s => {
         if(!branchMatrix[s.branch]) branchMatrix[s.branch] = {};
         branchMatrix[s.branch][s.position] = (branchMatrix[s.branch][s.position] || 0) + 1;
@@ -142,6 +149,7 @@ function renderUI(displayData, totalData) {
         tenureMatrix[tenureInfo.bracket][s.position] = (tenureMatrix[tenureInfo.bracket][s.position] || 0) + 1;
     });
 
+    // Use filtered data for the main table
     displayData.forEach(s => {
         const tenureInfo = getTenureData(s.dateHired);
         const row = tbody.insertRow();
@@ -163,7 +171,7 @@ window.deleteRec = (id) => {
 };
 
 function renderMatrix(groupedData, elementId, firstColName, customKeys = null) {
-    let html = `<table class="summary-table"><thead><tr><th style="text-align: left; padding-left: 10px;">${firstColName}</th>`;
+    let html = `<table class="summary-table"><thead><tr><th style="text-align: left; padding-left: 10px; width: 15%">${firstColName}</th>`;
     positions.forEach(p => html += `<th>${p}</th>`);
     html += `<th>TOTAL</th></tr></thead><tbody>`;
     const columnTotals = new Array(positions.length).fill(0);
@@ -171,7 +179,7 @@ function renderMatrix(groupedData, elementId, firstColName, customKeys = null) {
     let grandTotalCount = 0;
     keys.forEach(key => {
         let rowTot = 0;
-        html += `<tr><td style="text-align: left; padding-left: 10px;">${key}</td>`;
+        html += `<tr><td style="text-align: left; padding-left: 10px; font-weight: 500">${key}</td>`;
         positions.forEach((p, i) => {
             let val = (groupedData[key] && groupedData[key][p]) ? groupedData[key][p] : 0;
             rowTot += val; columnTotals[i] += val;

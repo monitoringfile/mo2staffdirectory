@@ -20,7 +20,8 @@ const db = getDatabase(app);
 const positions = ["Buffer Trust Staff", "Trust Staff", "Senior Trust Staff", "Branch Supervisor", "Area Head"];
 const tenureBrackets = ["New Hire (<1y)", "Junior (1-3y)", "Senior (3-5y)", "Veteran (5y+)"];
 
-// Global Auth Observer
+let globalStaffData = [];
+
 onAuthStateChanged(auth, (user) => {
     if (user) {
         document.getElementById('login-screen').classList.add('hidden');
@@ -38,7 +39,6 @@ onAuthStateChanged(auth, (user) => {
     }
 });
 
-// Login Handler - Attached to Window
 window.handleLogin = async () => {
     const email = document.getElementById('loginEmail').value;
     const pass = document.getElementById('loginPass').value;
@@ -62,12 +62,35 @@ function initOnlineTracker() {
 
 function initDirectory() {
     onValue(ref(db, 'staff'), (snap) => {
-        const list = [];
+        globalStaffData = [];
         const data = snap.val();
-        if (data) Object.keys(data).forEach(k => list.push({ id: k, ...data[k] }));
-        renderUI(list);
+        if (data) {
+            Object.keys(data).forEach(k => globalStaffData.push({ id: k, ...data[k] }));
+            // Reverse so new entries appear first in the array
+            globalStaffData.reverse(); 
+        }
+        applyFilters();
     });
 }
+
+function applyFilters() {
+    const search = document.getElementById('searchBox').value.toLowerCase();
+    const branch = document.getElementById('filterBranch').value;
+    const pos = document.getElementById('filterPosition').value;
+
+    const filtered = globalStaffData.filter(s => {
+        const matchSearch = s.staffName.toLowerCase().includes(search);
+        const matchBranch = branch === "" || s.branch === branch;
+        const matchPos = pos === "" || s.position === pos;
+        return matchSearch && matchBranch && matchPos;
+    });
+
+    renderUI(filtered, globalStaffData);
+}
+
+['searchBox', 'filterBranch', 'filterPosition'].forEach(id => {
+    document.getElementById(id).addEventListener('input', applyFilters);
+});
 
 const fieldIds = ['branch', 'staffName', 'position', 'contact', 'dateHired', 'birthday', 'address'];
 const validateFields = () => {
@@ -97,29 +120,30 @@ function getTenureData(hired) {
     let y = now.getFullYear() - d.getFullYear();
     let m = now.getMonth() - d.getMonth();
     if (m < 0) { y--; m += 12; }
-    
     let bracket = "Veteran (5y+)";
     if (y < 1) bracket = "New Hire (<1y)";
     else if (y < 3) bracket = "Junior (1-3y)";
     else if (y < 5) bracket = "Senior (3-5y)";
-    
     return { str: `${y}y ${m}m`, bracket: bracket };
 }
 
-function renderUI(data) {
+function renderUI(displayData, totalData) {
     const tbody = document.getElementById('staffTableBody');
     tbody.innerHTML = '';
+    
     const branchMatrix = {};
     const tenureMatrix = {};
     tenureBrackets.forEach(b => tenureMatrix[b] = {});
 
-    data.forEach(s => {
+    totalData.forEach(s => {
         if(!branchMatrix[s.branch]) branchMatrix[s.branch] = {};
         branchMatrix[s.branch][s.position] = (branchMatrix[s.branch][s.position] || 0) + 1;
-
         const tenureInfo = getTenureData(s.dateHired);
         tenureMatrix[tenureInfo.bracket][s.position] = (tenureMatrix[tenureInfo.bracket][s.position] || 0) + 1;
+    });
 
+    displayData.forEach(s => {
+        const tenureInfo = getTenureData(s.dateHired);
         const row = tbody.insertRow();
         row.innerHTML = `
             <td>${s.branch}</td><td style="font-weight:bold">${s.staffName}</td><td>${s.position}</td>
@@ -129,6 +153,7 @@ function renderUI(data) {
             <td><button style="color:var(--accent-red); background:none; font-size:10px" onclick="deleteRec('${s.id}')">REMOVE</button></td>
         `;
     });
+
     renderMatrix(branchMatrix, "branchPositionSummary", "Branch");
     renderMatrix(tenureMatrix, "tenurePositionSummary", "Tenure Bracket", tenureBrackets);
 }
@@ -138,37 +163,25 @@ window.deleteRec = (id) => {
 };
 
 function renderMatrix(groupedData, elementId, firstColName, customKeys = null) {
-    let html = `<table class="summary-table">
-        <thead>
-            <tr>
-                <th style="text-align: left; padding-left: 10px;">${firstColName}</th>`;
-    
+    let html = `<table class="summary-table"><thead><tr><th style="text-align: left; padding-left: 10px;">${firstColName}</th>`;
     positions.forEach(p => html += `<th>${p}</th>`);
-    
     html += `<th>TOTAL</th></tr></thead><tbody>`;
-
     const columnTotals = new Array(positions.length).fill(0);
     const keys = customKeys || Object.keys(groupedData).sort();
     let grandTotalCount = 0;
-
     keys.forEach(key => {
         let rowTot = 0;
         html += `<tr><td style="text-align: left; padding-left: 10px;">${key}</td>`;
         positions.forEach((p, i) => {
             let val = (groupedData[key] && groupedData[key][p]) ? groupedData[key][p] : 0;
-            rowTot += val;
-            columnTotals[i] += val;
-            // Hide 0 values by checking if val is 0
+            rowTot += val; columnTotals[i] += val;
             html += `<td>${val === 0 ? '' : val}</td>`;
         });
         grandTotalCount += rowTot;
         html += `<td style="font-weight:bold; color:var(--accent-blue)">${rowTot === 0 ? '' : rowTot}</td></tr>`;
     });
-
-    html += `<tr class="grand-total-row">
-        <td style="text-align: left; padding-left: 10px;">GRAND TOTAL</td>`;
+    html += `<tr class="grand-total-row"><td style="text-align: left; padding-left: 10px;">GRAND TOTAL</td>`;
     columnTotals.forEach(ct => html += `<td>${ct === 0 ? '' : ct}</td>`);
     html += `<td>${grandTotalCount === 0 ? '' : grandTotalCount}</td></tr></tbody></table>`;
-
     document.getElementById(elementId).innerHTML = html;
 }

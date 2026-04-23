@@ -14,25 +14,25 @@
         <h2 style="color:var(--accent-blue)">System Access</h2>
         <div class="input-field" style="margin-bottom:15px">
             <label>Email</label>
-            <input type="email" id="loginEmail" placeholder="Email Add">
+            <input type="email" id="loginEmail" placeholder="user@rafi.org.ph">
         </div>
         <div class="input-field" style="margin-bottom:20px">
             <label>Password</label>
-            <input type="password" id="loginPass" placeholder="***">
+            <input type="password" id="loginPass" placeholder="••••••••">
         </div>
         <button class="btn-add" id="loginBtn" onclick="handleLogin()">Sign In</button>
     </div>
 </div>
 
 <div id="sidebar" class="hidden">
-    <div class="sidebar-title">Online Branch Supervisor</div>
+    <div class="sidebar-title">Online Staff</div>
     <div id="online-list"></div>
     <button class="btn-logout" id="logoutBtn">Logout</button>
 </div>
 
 <div id="main-content" class="hidden">
     <div class="container">
-        <h2 style="margin-top:0; color:var(--accent-blue)">Staff Directory | Misamis Orienatl 2 Area</h2>
+        <h2 style="margin-top:0; color:var(--accent-blue)">Staff Directory | MO2</h2>
         
         <div class="input-grid">
             <div class="input-field"><label>Branch</label>
@@ -46,7 +46,7 @@
                     <option value="Salay">Salay</option>
                 </select>
             </div>
-            <div class="input-field"><label>Staff Name</label><input type="text" id="staffName" placeholder="fom Instafin Name"></div>
+            <div class="input-field"><label>Staff Name</label><input type="text" id="staffName" placeholder="Full Name"></div>
             <div class="input-field"><label>Position</label>
                 <select id="position">
                     <option value="">-- Select --</option>
@@ -60,7 +60,7 @@
             <div class="input-field"><label>Contact</label><input type="text" id="contact" maxlength="11" placeholder="09xxxxxxxxx"></div>
             <div class="input-field"><label>Hired Date</label><input type="date" id="dateHired"></div>
             <div class="input-field"><label>Birthday</label><input type="date" id="birthday"></div>
-            <div class="input-field"><label>Home Address</label><input type="text" id="address" placeholder="Brgy/City/Municipality"></div>
+            <div class="input-field"><label>Home Address</label><input type="text" id="address" placeholder="City/Municipality"></div>
         </div>
 
         <button id="saveBtn" class="btn-add" disabled>Add to Registry</button>

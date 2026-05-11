@@ -146,15 +146,11 @@ function renderUI(displayData, totalData) {
     displayData.forEach(s => {
         const tenureInfo = getTenureData(s.dateHired);
         const row = tbody.insertRow();
+        // Added <td>${s.birthday}</td> before the age column
         row.innerHTML = `
-            <td>${s.branch}</td>
-            <td style="font-weight:bold">${s.staffName}</td>
-            <td>${s.position}</td>
-            <td>${s.contact}</td>
-            <td class="address-cell" title="${s.address}">${s.address}</td>
-            <td>${s.dateHired}</td>
-            <td>${s.birthday}</td>
-            <td>${calculateAge(s.birthday)}</td>
+            <td>${s.branch}</td><td style="font-weight:bold">${s.staffName}</td><td>${s.position}</td>
+            <td>${s.contact}</td><td class="address-cell" title="${s.address}">${s.address}</td>
+            <td>${s.dateHired}</td><td>${s.birthday}</td><td>${calculateAge(s.birthday)}</td>
             <td style="color:var(--accent-blue); font-weight:bold">${tenureInfo.str}</td>
             <td><button style="color:var(--accent-red); background:none; font-size:10px" onclick="deleteRec('${s.id}')">REMOVE</button></td>
         `;

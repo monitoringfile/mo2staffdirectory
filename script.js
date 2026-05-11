@@ -17,7 +17,6 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
 
-// Added "Loan Processor" to the positions array
 const positions = ["Buffer Trust Staff", "Trust Staff", "Senior Trust Staff", "Loan Processor", "Branch Supervisor", "Area Head"];
 const tenureBrackets = ["New Hire (<1y)", "Junior (1-3y)", "Senior (3-5y)", "Veteran (5y+)"];
 
@@ -148,9 +147,14 @@ function renderUI(displayData, totalData) {
         const tenureInfo = getTenureData(s.dateHired);
         const row = tbody.insertRow();
         row.innerHTML = `
-            <td>${s.branch}</td><td style="font-weight:bold">${s.staffName}</td><td>${s.position}</td>
-            <td>${s.contact}</td><td class="address-cell" title="${s.address}">${s.address}</td>
-            <td>${s.dateHired}</td><td>${calculateAge(s.birthday)}</td>
+            <td>${s.branch}</td>
+            <td style="font-weight:bold">${s.staffName}</td>
+            <td>${s.position}</td>
+            <td>${s.contact}</td>
+            <td class="address-cell" title="${s.address}">${s.address}</td>
+            <td>${s.dateHired}</td>
+            <td>${s.birthday}</td>
+            <td>${calculateAge(s.birthday)}</td>
             <td style="color:var(--accent-blue); font-weight:bold">${tenureInfo.str}</td>
             <td><button style="color:var(--accent-red); background:none; font-size:10px" onclick="deleteRec('${s.id}')">REMOVE</button></td>
         `;
